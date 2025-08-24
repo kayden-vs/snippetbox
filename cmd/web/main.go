@@ -1,4 +1,4 @@
-package web
+package main
 
 import (
 	"log"
@@ -8,12 +8,15 @@ import (
 )
 
 func main() {
-
 	r := chi.NewRouter()
+
+	// Serve static files
+	fileServer := http.FileServer(http.Dir("./ui/static"))
+	r.Handle("/static/*", http.StripPrefix("/static", fileServer))
 
 	r.Get("/", home)
 	r.Get("/snippet/view", snippetView)
-	r.Get("/snippet/create", snippetCreate)
+	r.Post("/snippet/create", snippetCreate)
 
 	err := http.ListenAndServe(":4000", r)
 	log.Fatal(err)

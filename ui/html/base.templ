@@ -1,0 +1,24 @@
+package html
+
+import "github.com/kayden-vs/snippetbox/ui/html/partials"
+
+templ Base(title string, body templ.Component){
+    <!DOCTYPE html>
+    <html lang='en'>
+    <head>
+        <meta charset='utf-8'>
+        <title>{ title } - Snippetbox</title>
+        <link rel='stylesheet' href='/static/css/style.css'>
+    </head>
+    <body>
+        <header>
+            <h1><a href='/'>Snippetbox</a></h1>
+        </header>
+        @partials.NavBar()
+        <main>
+            @body
+        </main>
+        <footer>Powered by <a href='https://golang.org/'>Go</a></footer>
+    </body>
+    </html>
+}

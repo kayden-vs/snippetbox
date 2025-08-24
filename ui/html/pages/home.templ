@@ -1,0 +1,12 @@
+package pages
+
+import "github.com/kayden-vs/snippetbox/ui/html"
+
+templ HomePage(){
+    @html.Base("Home", homeContent())
+}
+
+templ homeContent() {
+    <h2>Latest Snippets</h2>
+    <p>There's nothing to see here yet!</p>
+}
