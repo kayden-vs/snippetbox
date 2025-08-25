@@ -44,7 +44,7 @@ func Base(title string, body templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " - Snippetbox</title></head><body><header><h1><a href=\"/\">Snippetbox</a></h1></header>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " - Snippetbox</title><link rel=\"stylesheet\" href=\"/static/css/main.css\"></head><body><header><h1><a href=\"/\">Snippetbox</a></h1></header>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

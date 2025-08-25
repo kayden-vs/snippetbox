@@ -1,23 +1,38 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
-
-	"github.com/go-chi/chi/v5"
+	"os"
 )
 
+type application struct {
+	errorLog *log.Logger
+	infoLog  *log.Logger
+}
+
 func main() {
-	r := chi.NewRouter()
+	addr := flag.String("addr", ":4000", "HTTP server port")
 
-	// Serve static files
-	fileServer := http.FileServer(http.Dir("./ui/static"))
-	r.Handle("/static/*", http.StripPrefix("/static", fileServer))
+	flag.Parse()
 
-	r.Get("/", home)
-	r.Get("/snippet/view", snippetView)
-	r.Post("/snippet/create", snippetCreate)
+	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
-	err := http.ListenAndServe(":4000", r)
-	log.Fatal(err)
+	app := &application{
+		errorLog: errorLog,
+		infoLog:  infoLog,
+	}
+
+	infoLog.Printf("Starting server on %s", *addr)
+
+	srv := &http.Server{
+		Addr:     *addr,
+		ErrorLog: errorLog,
+		Handler:  app.routes(),
+	}
+
+	err := srv.ListenAndServe()
+	errorLog.Fatal(err)
 }
