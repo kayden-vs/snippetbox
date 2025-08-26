@@ -1,0 +1,21 @@
+package pages
+
+import "github.com/kayden-vs/snippetbox/ui/html"
+
+templ ViewSnippet(id int, title,content , created, expires string){
+    @html.Base(title, viewContent(id,title,content,created,expires))
+}
+
+templ viewContent(id int, title,content , created, expires string){
+    <div class='snippet'>
+        <div class='metadata'>
+            <strong>{title}</strong>
+            <span>#{id}</span>
+        </div>
+        <pre><code>{content}</code></pre>
+        <div class='metadata'>
+            <time>Created: {created}</time>
+            <time>Expires: {expires}</time>
+        </div>
+    </div>
+}

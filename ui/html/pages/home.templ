@@ -1,12 +1,32 @@
 package pages
 
-import "github.com/kayden-vs/snippetbox/ui/html"
+import (
+    "github.com/kayden-vs/snippetbox/ui/html"
+    "github.com/kayden-vs/snippetbox/internal/models"
+    "strconv"
+)
 
-templ HomePage(){
-    @html.Base("Home", homeContent())
+templ HomePage(snippets []*models.Snippet){
+    @html.Base("Home", homeContent(snippets))
 }
 
-templ homeContent() {
-    <h2>Latest Snippets</h2>
-    <p>There's nothing to see here yet!</p>
+templ homeContent(snippets []*models.Snippet) {
+    if snippets != nil{
+        <table>
+        <tr>
+            <th>Title</th>
+            <th>Created</th>
+            <th>ID</th>
+        </tr>
+        for _,snippet := range snippets{
+        <tr>
+            <td><a href={"/snippet/view?id=" + strconv.Itoa(snippet.ID)}>{snippet.Title}</a></td>
+            <td>{ snippet.Created.Format("02 Jan 2006 at 15:04") }</td>
+            <td>#{snippet.ID}</td>
+        </tr>
+        }
+        </table>
+    }else{
+        <p>There's nothing to see here... yet!</p>
+    }
 }

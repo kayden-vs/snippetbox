@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"runtime/debug"
+
+	"github.com/a-h/templ"
 )
 
 func (app *application) serverError(w http.ResponseWriter, err error) {
@@ -19,4 +22,13 @@ func (app *application) clientError(w http.ResponseWriter, status int) {
 
 func (app *application) notFound(w http.ResponseWriter) {
 	app.clientError(w, http.StatusNotFound)
+}
+
+func (app *application) Render(w http.ResponseWriter, component templ.Component) {
+	err := component.Render(context.Background(), w)
+	if err != nil {
+		app.errorLog.Println(err.Error())
+		app.serverError(w, err)
+		return
+	}
 }

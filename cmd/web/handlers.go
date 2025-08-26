@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/kayden-vs/snippetbox/internal/models"
+	"github.com/kayden-vs/snippetbox/ui/html/pages"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -20,17 +21,8 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
-	for _, snippet := range snippets {
-		fmt.Fprintf(w, "%+v\n", snippet)
-	}
 
-	// component := pages.HomePage()
-	// err := component.Render(context.Background(), w)
-	// if err != nil {
-	// 	app.errorLog.Println(err.Error())
-	// 	app.serverError(w, err)
-	// 	return
-	// }
+	app.Render(w, pages.HomePage(snippets))
 }
 
 func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
@@ -49,8 +41,11 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	fmt.Fprintf(w, "%+v", snippet)
-	// fmt.Fprintf(w, "ID: %d\nTitle: %s\nContent: %s\nCreated: %v\nExpires: %v\n", snippet.ID, snippet.Title, snippet.Content, snippet.Created, snippet.Expires)
+
+	createdStr := snippet.Created.Format("02 Jan 2006 at 15:04")
+	expiresStr := snippet.Expires.Format("02 Jan 2006 at 15:04")
+	component := pages.ViewSnippet(snippet.ID, snippet.Title, snippet.Content, createdStr, expiresStr)
+	app.Render(w, component)
 }
 
 func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
