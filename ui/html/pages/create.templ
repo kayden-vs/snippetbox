@@ -1,12 +1,15 @@
 package pages
 
-import "github.com/kayden-vs/snippetbox/ui/html"
+import (
+    "github.com/kayden-vs/snippetbox/ui/html"
+    "github.com/kayden-vs/snippetbox/internal/validator"
+)
 
 type SnippetCreateForm struct {
-	Title       string
-	Content     string
-	Expires     int
-	FieldErrors map[string]string
+    Title   string
+    Content string
+    Expires int
+    validator.Validator  
 }
 
 templ SnippetForm(formData SnippetCreateForm){
