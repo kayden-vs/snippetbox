@@ -7,14 +7,16 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/go-playground/form"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/kayden-vs/snippetbox/internal/models"
 )
 
 type application struct {
-	errorLog *log.Logger
-	infoLog  *log.Logger
-	snippets *models.SnippetModel
+	errorLog    *log.Logger
+	infoLog     *log.Logger
+	snippets    *models.SnippetModel
+	formDecoder *form.Decoder
 }
 
 func main() {
@@ -32,10 +34,13 @@ func main() {
 	}
 	defer db.Close()
 
+	formDecoder := form.NewDecoder()
+
 	app := &application{
-		errorLog: errorLog,
-		infoLog:  infoLog,
-		snippets: &models.SnippetModel{DB: db},
+		errorLog:    errorLog,
+		infoLog:     infoLog,
+		snippets:    &models.SnippetModel{DB: db},
+		formDecoder: formDecoder,
 	}
 
 	infoLog.Printf("Starting server on %s", *addr)

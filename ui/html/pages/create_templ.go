@@ -14,10 +14,10 @@ import (
 )
 
 type SnippetCreateForm struct {
-	Title               string
-	Content             string
-	Expires             int
-	validator.Validator // Embed the validator
+	Title               string `form:"title"`
+	Content             string `form:"content"`
+	Expires             int    `form:"expires"`
+	validator.Validator `form:"-"`
 }
 
 func SnippetForm(formData SnippetCreateForm) templ.Component {
