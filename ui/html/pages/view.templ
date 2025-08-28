@@ -1,16 +1,17 @@
 package pages
 
 import "github.com/kayden-vs/snippetbox/ui/html"
+import "strconv"
 
-templ ViewSnippet(id int, title,content , created, expires string){
-    @html.Base(title, viewContent(id,title,content,created,expires))
+templ ViewSnippet(id int, title, content, created, expires string){
+    @html.Base(title, viewContent(id, title, content, created, expires))
 }
 
-templ viewContent(id int, title,content , created, expires string){
+templ viewContent(id int, title, content, created, expires string){
     <div class='snippet'>
         <div class='metadata'>
             <strong>{title}</strong>
-            <span>#{id}</span>
+            <span>#{strconv.Itoa(id)}</span>
         </div>
         <pre><code>{content}</code></pre>
         <div class='metadata'>

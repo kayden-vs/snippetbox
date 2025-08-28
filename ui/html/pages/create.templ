@@ -1,0 +1,58 @@
+package pages
+
+import "github.com/kayden-vs/snippetbox/ui/html"
+
+type SnippetCreateForm struct {
+	Title       string
+	Content     string
+	Expires     int
+	FieldErrors map[string]string
+}
+
+templ SnippetForm(formData SnippetCreateForm){
+    @html.Base("New snippet", actualForm(formData))
+}
+
+templ actualForm(formData SnippetCreateForm){
+    <form action='/snippet/create' method='POST'>
+    <div>
+        <label>Title:</label>
+        <input type='text' name='title' value={ formData.Title }>
+        if formData.FieldErrors["title"] != ""{
+            <p class="error">{ formData.FieldErrors["title"] }</p>
+        }
+    </div>
+    <div>
+        <label>Content:</label>
+        <textarea name='content'>{ formData.Content }</textarea>
+        if formData.FieldErrors["content"] != ""{
+            <p class="error">{ formData.FieldErrors["content"] }</p>
+        }
+    </div>
+    <div>
+        <label>Delete in:</label>
+        <input type='radio' name='expires' value='365' 
+            if formData.Expires == 365 {
+                checked
+            }
+        > One Year
+        <input type='radio' name='expires' value='7'
+            if formData.Expires == 7 {
+                checked
+            }
+        > One Week
+        <input type='radio' name='expires' value='1'
+            if formData.Expires == 1 {
+                checked
+            }
+        > One Day
+        if formData.FieldErrors["expires"] != ""{
+            <p class="error">{ formData.FieldErrors["expires"] }</p>
+        }
+    </div>
+    <div>
+        <input type='submit' value='Publish snippet'>
+    </div>
+</form>
+}
+

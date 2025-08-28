@@ -20,7 +20,7 @@ templ homeContent(snippets []*models.Snippet) {
         </tr>
         for _,snippet := range snippets{
         <tr>
-            <td><a href={"/snippet/view?id=" + strconv.Itoa(snippet.ID)}>{snippet.Title}</a></td>
+            <td><a href={"/snippet/view/" + strconv.Itoa(snippet.ID)}>{snippet.Title}</a></td>
             <td>{ snippet.Created.Format("02 Jan 2006 at 15:04") }</td>
             <td>#{snippet.ID}</td>
         </tr>
