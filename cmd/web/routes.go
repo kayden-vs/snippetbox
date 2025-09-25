@@ -23,10 +23,19 @@ func (app *application) routes() *chi.Mux {
 	fileServer := http.FileServer(http.Dir("./ui/static"))
 	r.Handle("/static/*", http.StripPrefix("/static", fileServer))
 
-	r.Get("/", app.home)
-	r.Get("/snippet/view/{id}", app.snippetView)
-	r.Get("/snippet/create", app.snippetCreateForm)
-	r.Post("/snippet/create", app.snippetCreate)
+	// for session
+	dynamic := app.sessionManager.LoadAndSave
+
+	r.With(dynamic).Get("/", app.home)
+
+	r.Route("/snippet", func(r chi.Router) {
+		// Apply middleware to everything inside this group
+		r.Use(dynamic)
+
+		r.Get("/view/{id}", app.snippetView)
+		r.Get("/create", app.snippetCreateForm)
+		r.Post("/create", app.snippetCreate)
+	})
 
 	return r
 }

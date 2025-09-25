@@ -3,8 +3,8 @@ package pages
 import "github.com/kayden-vs/snippetbox/ui/html"
 import "strconv"
 
-templ ViewSnippet(id int, title, content, created, expires string){
-    @html.Base(title, viewContent(id, title, content, created, expires))
+templ ViewSnippet(id int, title, content, created, expires, flash string){
+    @html.Base(title, flash, viewContent(id, title, content, created, expires))
 }
 
 templ viewContent(id int, title, content, created, expires string){

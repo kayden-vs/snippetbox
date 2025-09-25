@@ -13,7 +13,7 @@ type SnippetCreateForm struct {
 }
 
 templ SnippetForm(formData SnippetCreateForm){
-    @html.Base("New snippet", actualForm(formData))
+    @html.Base("New snippet","", actualForm(formData))
 }
 
 templ actualForm(formData SnippetCreateForm){

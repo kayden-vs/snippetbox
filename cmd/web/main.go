@@ -6,17 +6,21 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
+	"github.com/alexedwards/scs/mysqlstore"
+	"github.com/alexedwards/scs/v2"
 	"github.com/go-playground/form"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/kayden-vs/snippetbox/internal/models"
 )
 
 type application struct {
-	errorLog    *log.Logger
-	infoLog     *log.Logger
-	snippets    *models.SnippetModel
-	formDecoder *form.Decoder
+	errorLog       *log.Logger
+	infoLog        *log.Logger
+	snippets       *models.SnippetModel
+	formDecoder    *form.Decoder
+	sessionManager *scs.SessionManager
 }
 
 func main() {
@@ -36,11 +40,16 @@ func main() {
 
 	formDecoder := form.NewDecoder()
 
+	sessionManager := scs.New()
+	sessionManager.Store = mysqlstore.New(db)
+	sessionManager.Lifetime = 12 * time.Hour
+
 	app := &application{
-		errorLog:    errorLog,
-		infoLog:     infoLog,
-		snippets:    &models.SnippetModel{DB: db},
-		formDecoder: formDecoder,
+		errorLog:       errorLog,
+		infoLog:        infoLog,
+		snippets:       &models.SnippetModel{DB: db},
+		formDecoder:    formDecoder,
+		sessionManager: sessionManager,
 	}
 
 	infoLog.Printf("Starting server on %s", *addr)

@@ -41,9 +41,11 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	flash := app.sessionManager.PopString(r.Context(), "flash")
+
 	createdStr := snippet.Created.Format("02 Jan 2006 at 15:04")
 	expiresStr := snippet.Expires.Format("02 Jan 2006 at 15:04")
-	component := pages.ViewSnippet(snippet.ID, snippet.Title, snippet.Content, createdStr, expiresStr)
+	component := pages.ViewSnippet(snippet.ID, snippet.Title, snippet.Content, createdStr, expiresStr, flash)
 	app.Render(w, component)
 }
 
@@ -75,6 +77,8 @@ func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	app.infoLog.Println("New Data added, Id: ", id)
+
+	app.sessionManager.Put(r.Context(), "flash", "Snippet successfully created!")
 
 	http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)
 }

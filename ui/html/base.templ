@@ -2,7 +2,8 @@ package html
 
 import "github.com/kayden-vs/snippetbox/ui/html/partials"
 
-templ Base(title string, body templ.Component){
+// pass the flash msg too if available otherwise empty string
+templ Base(title string, flash string, body templ.Component){
     <!DOCTYPE html>
     <html lang='en'>
     <head>
@@ -16,6 +17,9 @@ templ Base(title string, body templ.Component){
         </header>
         @partials.NavBar()
         <main>
+            if flash != ""{
+                <div class='flash'>{ flash }</div>
+            }
             @body
         </main>
         <footer>Powered by <a href='https://golang.org/'>Go</a></footer>
