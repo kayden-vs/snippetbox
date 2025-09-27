@@ -1,0 +1,42 @@
+package pages
+
+import "github.com/kayden-vs/snippetbox/ui/html"
+
+type SignupFormParams struct {
+	Name   string
+	Email  string
+	Errors map[string]string
+}
+
+templ SignupPage(props SignupFormParams){
+	@html.Base("Sign Up", "", Signup(props))
+}
+
+templ Signup(props SignupFormParams) {
+	<form action="/user/signup" method="POST" novalidate>
+		<div>
+			<label for="name">Name:</label>
+			if props.Errors["name"] != "" {
+				<label class="error">{ props.Errors["name"] }</label>
+			}
+			<input type="text" id="name" name="name" value={ props.Name }/>
+		</div>
+		<div>
+			<label for="email">Email:</label>
+			if props.Errors["email"] != "" {
+				<label class="error">{ props.Errors["email"] }</label>
+			}
+			<input type="email" id="email" name="email" value={ props.Email }/>
+		</div>
+		<div>
+			<label for="password">Password:</label>
+			if props.Errors["password"] != "" {
+				<label class="error">{ props.Errors["password"] }</label>
+			}
+			<input type="password" id="password" name="password"/>
+		</div>
+		<div>
+			<input type="submit" value="Signup"/>
+		</div>
+	</form>
+}

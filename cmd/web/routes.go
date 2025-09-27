@@ -33,8 +33,19 @@ func (app *application) routes() *chi.Mux {
 		r.Use(dynamic)
 
 		r.Get("/view/{id}", app.snippetView)
-		r.Get("/create", app.snippetCreateForm)
-		r.Post("/create", app.snippetCreate)
+		r.Get("/create", app.snippetCreate)
+		r.Post("/create", app.snippetCreatePost)
+	})
+
+	r.Route("/user", func(r chi.Router) {
+
+		r.Use(dynamic)
+
+		r.Get("/signup", app.userSignup)
+		r.Post("/signup", app.userSignupPost)
+		r.Get("/login", app.userLogin)
+		r.Post("/login", app.userLoginPost)
+		r.Post("/logout", app.userLogoutPost)
 	})
 
 	return r

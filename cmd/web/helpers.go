@@ -27,17 +27,14 @@ func (app *application) notFound(w http.ResponseWriter) {
 }
 
 func (app *application) Render(w http.ResponseWriter, component templ.Component) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
 	err := component.Render(context.Background(), w)
 	if err != nil {
 		app.errorLog.Println(err.Error())
 		app.serverError(w, err)
 		return
 	}
-}
-
-func (app *application) renderWithFlash(w http.ResponseWriter, r *http.Request, component func(flash string) templ.Component) {
-	flash := app.sessionManager.PopString(r.Context(), "flash")
-	app.Render(w, component(flash))
 }
 
 func (app *application) decodePostForm(r *http.Request, dst any) error {
