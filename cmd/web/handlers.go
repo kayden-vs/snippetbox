@@ -120,9 +120,9 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 	form.CheckField(validator.MinChars(form.Password, 8), "password", "This field must be at least 8 characters long")
 
 	props := pages.SignupFormParams{
-		Name:   form.Name,
-		Email:  form.Email,
-		Errors: form.FieldErrors,
+		Name:        form.Name,
+		Email:       form.Email,
+		FieldErrors: form.FieldErrors,
 	}
 
 	// If there are any errors, redisplay the signup form along with a 422
@@ -136,7 +136,7 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, models.ErrDuplicateEmail) {
 			form.AddFieldError("email", "Email address is already in use")
-			props.Errors = form.FieldErrors
+			props.FieldErrors = form.FieldErrors
 			app.Render(w, pages.SignupPage(props))
 		} else {
 			app.serverError(w, err)
@@ -148,12 +148,61 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 }
 
+type userLoginForm struct {
+	Email               string `form:"email"`
+	Password            string `form:"password"`
+	validator.Validator `form:"-"`
+}
+
 func (app *application) userLogin(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Display a HTML form for logging in a user...")
+	flash := app.sessionManager.PopString(r.Context(), "flash")
+	props := pages.LoginFormParams{}
+	app.Render(w, pages.LoginPage(props, flash))
 }
 
 func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Authenticate and login the user...")
+	var form userLoginForm
+
+	err := app.decodePostForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
+	form.CheckField(validator.Matches(form.Email, validator.EmailRX), "email", "This field must be a valid email address")
+	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
+
+	props := pages.LoginFormParams{
+		Email:          form.Email,
+		FieldErrors:    form.FieldErrors,
+		NonFieldErrors: form.NonFieldErrors,
+	}
+	if !form.Valid() {
+		app.Render(w, pages.LoginPage(props, "")) // will fix this
+		return
+	}
+
+	id, err := app.users.Authenticate(form.Email, form.Password)
+	if err != nil {
+		if errors.Is(err, models.ErrInvalidCredentials) {
+			form.AddNonFieldError("Email or password is incorrect")
+			props.NonFieldErrors = form.NonFieldErrors
+			app.Render(w, pages.LoginPage(props, "")) // will fix this
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+
+	err = app.sessionManager.RenewToken(r.Context())
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	app.sessionManager.Put(r.Context(), "authenticatedUserID", id)
+
+	http.Redirect(w, r, "/snippet/create", http.StatusSeeOther)
 }
 
 func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {

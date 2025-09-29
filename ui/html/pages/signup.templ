@@ -5,7 +5,7 @@ import "github.com/kayden-vs/snippetbox/ui/html"
 type SignupFormParams struct {
 	Name   string
 	Email  string
-	Errors map[string]string
+	FieldErrors map[string]string
 }
 
 templ SignupPage(props SignupFormParams){
@@ -16,22 +16,22 @@ templ Signup(props SignupFormParams) {
 	<form action="/user/signup" method="POST" novalidate>
 		<div>
 			<label for="name">Name:</label>
-			if props.Errors["name"] != "" {
-				<label class="error">{ props.Errors["name"] }</label>
+			if props.FieldErrors["name"] != "" {
+				<label class="error">{ props.FieldErrors["name"] }</label>
 			}
 			<input type="text" id="name" name="name" value={ props.Name }/>
 		</div>
 		<div>
 			<label for="email">Email:</label>
-			if props.Errors["email"] != "" {
-				<label class="error">{ props.Errors["email"] }</label>
+			if props.FieldErrors["email"] != "" {
+				<label class="error">{ props.FieldErrors["email"] }</label>
 			}
 			<input type="email" id="email" name="email" value={ props.Email }/>
 		</div>
 		<div>
 			<label for="password">Password:</label>
-			if props.Errors["password"] != "" {
-				<label class="error">{ props.Errors["password"] }</label>
+			if props.FieldErrors["password"] != "" {
+				<label class="error">{ props.FieldErrors["password"] }</label>
 			}
 			<input type="password" id="password" name="password"/>
 		</div>
