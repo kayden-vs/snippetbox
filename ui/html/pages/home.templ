@@ -6,8 +6,8 @@ import (
     "strconv"
 )
 
-templ HomePage(snippets []*models.Snippet){
-    @html.Base("Home", "", homeContent(snippets))
+templ HomePage(snippets []*models.Snippet, flash string, isAuthenticated bool){
+    @html.Base("Home", flash, isAuthenticated, homeContent(snippets))
 }
 
 templ homeContent(snippets []*models.Snippet) {

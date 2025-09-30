@@ -1,17 +1,26 @@
 package partials
 
-templ NavBar(){
+
+
+templ NavBar(isAuthenticated bool){
     <nav class="navbar">
         <div>
         <a href='/'>Home</a>
-        <a href='/snippet/create'>Create snippet</a>
+        if isAuthenticated{
+            <a href='/snippet/create'>Create snippet</a>
+        }
     </div>
+    if isAuthenticated{
     <div>
-        <a href='/user/signup'>Signup</a>
-        <a href='/user/login'>Login</a>
         <form action='/user/logout' method='POST'>
             <button>Logout</button>
         </form>
     </div>
+    } else {
+    <div>
+        <a href='/user/signup'>Signup</a>
+        <a href='/user/login'>Login</a>
+    </div>
+    }
     </nav>
 }

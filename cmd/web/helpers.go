@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -26,10 +25,16 @@ func (app *application) notFound(w http.ResponseWriter) {
 	app.clientError(w, http.StatusNotFound)
 }
 
-func (app *application) Render(w http.ResponseWriter, component templ.Component) {
+// RenderPage injects flash and isAuthenticated into the page component.
+func (app *application) RenderPage(
+	w http.ResponseWriter,
+	r *http.Request,
+	renderFunc func(flash string, isAuthenticated bool) templ.Component,
+) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
-	err := component.Render(context.Background(), w)
+	flash := app.sessionManager.PopString(r.Context(), "flash")
+	isAuth := app.isAuthenticated(r)
+	err := renderFunc(flash, isAuth).Render(r.Context(), w)
 	if err != nil {
 		app.errorLog.Println(err.Error())
 		app.serverError(w, err)
@@ -54,4 +59,8 @@ func (app *application) decodePostForm(r *http.Request, dst any) error {
 	}
 
 	return nil
+}
+
+func (app *application) isAuthenticated(r *http.Request) bool {
+	return app.sessionManager.Exists(r.Context(), "authenticatedUserID")
 }

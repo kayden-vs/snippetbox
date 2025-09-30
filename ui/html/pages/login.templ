@@ -8,8 +8,8 @@ type LoginFormParams struct {
     NonFieldErrors []string
 }
 
-templ LoginPage(props LoginFormParams, flash string){
-    @html.Base("Login", flash, Login(props)) 
+templ LoginPage(props LoginFormParams, flash string, isAuthenticated bool){
+    @html.Base("Login", flash,isAuthenticated, Login(props)) 
 }
 
 templ Login(props LoginFormParams){

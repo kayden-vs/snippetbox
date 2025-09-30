@@ -8,8 +8,8 @@ type SignupFormParams struct {
 	FieldErrors map[string]string
 }
 
-templ SignupPage(props SignupFormParams){
-	@html.Base("Sign Up", "", Signup(props))
+templ SignupPage(props SignupFormParams, isAuthenticated bool){
+	@html.Base("Sign Up", "",isAuthenticated, Signup(props))
 }
 
 templ Signup(props SignupFormParams) {

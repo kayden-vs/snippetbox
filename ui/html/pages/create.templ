@@ -12,8 +12,8 @@ type SnippetCreateForm struct {
     validator.Validator `form:"-"`
 }
 
-templ SnippetForm(formData SnippetCreateForm){
-    @html.Base("New snippet","", actualForm(formData))
+templ SnippetForm(formData SnippetCreateForm, isAuthenticated bool){
+    @html.Base("New snippet","",isAuthenticated , actualForm(formData))
 }
 
 templ actualForm(formData SnippetCreateForm){

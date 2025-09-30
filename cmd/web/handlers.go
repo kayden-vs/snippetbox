@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"
 	"github.com/kayden-vs/snippetbox/internal/models"
 	"github.com/kayden-vs/snippetbox/internal/validator"
@@ -20,7 +21,9 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.Render(w, pages.HomePage(snippets))
+	app.RenderPage(w, r, func(flash string, isAuthenticated bool) templ.Component {
+		return pages.HomePage(snippets, flash, isAuthenticated)
+	})
 }
 
 func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
@@ -41,12 +44,12 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	flash := app.sessionManager.PopString(r.Context(), "flash")
-
 	createdStr := snippet.Created.Format("02 Jan 2006 at 15:04")
 	expiresStr := snippet.Expires.Format("02 Jan 2006 at 15:04")
-	component := pages.ViewSnippet(snippet.ID, snippet.Title, snippet.Content, createdStr, expiresStr, flash)
-	app.Render(w, component)
+	app.RenderPage(w, r, func(flash string, isAuthenticated bool) templ.Component {
+		return pages.ViewSnippet(snippet.ID, snippet.Title, snippet.Content, createdStr, expiresStr, flash, isAuthenticated)
+
+	})
 }
 
 func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +70,12 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 	form.CheckField(validator.PermittedInt(form.Expires, 1, 7, 365), "expires", "This field must equal 1, 7 or 365")
 
 	if !form.Valid() {
-		app.Render(w, pages.SnippetForm(form))
+		app.RenderPage(w, r, func(flash string, isAuthenticated bool) templ.Component {
+			return pages.SnippetForm(form, isAuthenticated)
+		})
+		app.RenderPage(w, r, func(flash string, isAuthenticated bool) templ.Component {
+			return pages.SnippetForm(form, isAuthenticated)
+		})
 		return
 	}
 
@@ -88,7 +96,10 @@ func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
 		Expires:   365,
 		Validator: validator.Validator{FieldErrors: make(map[string]string)},
 	}
-	app.Render(w, pages.SnippetForm(form))
+
+	app.RenderPage(w, r, func(flash string, isAuthenticated bool) templ.Component {
+		return pages.SnippetForm(form, isAuthenticated)
+	})
 }
 
 type userSignupForm struct {
@@ -101,7 +112,9 @@ type userSignupForm struct {
 func (app *application) userSignup(w http.ResponseWriter, r *http.Request) {
 
 	props := pages.SignupFormParams{}
-	app.Render(w, pages.SignupPage(props))
+	app.RenderPage(w, r, func(flash string, isAuthenticated bool) templ.Component {
+		return pages.SignupPage(props, isAuthenticated)
+	})
 }
 
 func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
@@ -128,7 +141,9 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 	// If there are any errors, redisplay the signup form along with a 422
 	// status code.
 	if !form.Valid() {
-		app.Render(w, pages.SignupPage(props))
+		app.RenderPage(w, r, func(flash string, isAuthenticated bool) templ.Component {
+			return pages.SignupPage(props, isAuthenticated)
+		})
 		return
 	}
 
@@ -137,7 +152,9 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, models.ErrDuplicateEmail) {
 			form.AddFieldError("email", "Email address is already in use")
 			props.FieldErrors = form.FieldErrors
-			app.Render(w, pages.SignupPage(props))
+			app.RenderPage(w, r, func(flash string, isAuthenticated bool) templ.Component {
+				return pages.SignupPage(props, isAuthenticated)
+			})
 		} else {
 			app.serverError(w, err)
 		}
@@ -155,9 +172,10 @@ type userLoginForm struct {
 }
 
 func (app *application) userLogin(w http.ResponseWriter, r *http.Request) {
-	flash := app.sessionManager.PopString(r.Context(), "flash")
 	props := pages.LoginFormParams{}
-	app.Render(w, pages.LoginPage(props, flash))
+	app.RenderPage(w, r, func(flash string, isAuthenticated bool) templ.Component {
+		return pages.LoginPage(props, flash, isAuthenticated)
+	})
 }
 
 func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
@@ -179,7 +197,9 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		NonFieldErrors: form.NonFieldErrors,
 	}
 	if !form.Valid() {
-		app.Render(w, pages.LoginPage(props, "")) // will fix this
+		app.RenderPage(w, r, func(flash string, isAuthenticated bool) templ.Component {
+			return pages.LoginPage(props, flash, isAuthenticated)
+		})
 		return
 	}
 
@@ -188,7 +208,9 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, models.ErrInvalidCredentials) {
 			form.AddNonFieldError("Email or password is incorrect")
 			props.NonFieldErrors = form.NonFieldErrors
-			app.Render(w, pages.LoginPage(props, "")) // will fix this
+			app.RenderPage(w, r, func(flash string, isAuthenticated bool) templ.Component {
+				return pages.LoginPage(props, flash, isAuthenticated)
+			})
 		} else {
 			app.serverError(w, err)
 		}
@@ -206,5 +228,13 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Logout the user...")
+	err := app.sessionManager.RenewToken(r.Context())
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	app.sessionManager.Remove(r.Context(), "authenticatedUserID")
+	app.sessionManager.Put(r.Context(), "flash", "You've been logged out Succesfully!")
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
