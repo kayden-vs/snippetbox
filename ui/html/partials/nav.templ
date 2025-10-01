@@ -2,7 +2,7 @@ package partials
 
 
 
-templ NavBar(isAuthenticated bool){
+templ NavBar(isAuthenticated bool, csrfToken string){
     <nav class="navbar">
         <div>
         <a href='/'>Home</a>
@@ -13,6 +13,7 @@ templ NavBar(isAuthenticated bool){
     if isAuthenticated{
     <div>
         <form action='/user/logout' method='POST'>
+            <input type='hidden' name='csrf_token' value={ csrfToken }/>
             <button>Logout</button>
         </form>
     </div>

@@ -6,14 +6,16 @@ type LoginFormParams struct {
     Email               string
     FieldErrors map[string]string
     NonFieldErrors []string
+    CSRFToken string
 }
 
 templ LoginPage(props LoginFormParams, flash string, isAuthenticated bool){
-    @html.Base("Login", flash,isAuthenticated, Login(props)) 
+    @html.Base("Login", flash,isAuthenticated, props.CSRFToken, Login(props)) 
 }
 
 templ Login(props LoginFormParams){
     <form action='/user/login' method='POST' novalidate>
+        <input type='hidden' name='csrf_token' value={ props.CSRFToken }/>
         for _,v := range props.NonFieldErrors{
             <div class='error'>{ v }</div>
         }

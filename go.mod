@@ -9,6 +9,8 @@ require (
 	github.com/go-chi/chi/v5 v5.2.2
 	github.com/go-playground/form v3.1.4+incompatible
 	github.com/go-sql-driver/mysql v1.9.3
+	github.com/justinas/nosurf v1.2.0
+	golang.org/x/crypto v0.42.0
 )
 
 require (
@@ -22,7 +24,6 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/natefinch/atomic v1.0.1 // indirect
-	golang.org/x/crypto v0.42.0 // indirect
 	golang.org/x/mod v0.26.0 // indirect
 	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect

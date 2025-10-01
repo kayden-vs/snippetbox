@@ -6,14 +6,16 @@ type SignupFormParams struct {
 	Name   string
 	Email  string
 	FieldErrors map[string]string
+	CSRFToken string
 }
 
 templ SignupPage(props SignupFormParams, isAuthenticated bool){
-	@html.Base("Sign Up", "",isAuthenticated, Signup(props))
+	@html.Base("Sign Up", "",isAuthenticated, props.CSRFToken, Signup(props))
 }
 
 templ Signup(props SignupFormParams) {
 	<form action="/user/signup" method="POST" novalidate>
+		<input type='hidden' name='csrf_token' value={ props.CSRFToken }/>
 		<div>
 			<label for="name">Name:</label>
 			if props.FieldErrors["name"] != "" {

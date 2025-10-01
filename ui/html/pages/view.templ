@@ -3,8 +3,8 @@ package pages
 import "github.com/kayden-vs/snippetbox/ui/html"
 import "strconv"
 
-templ ViewSnippet(id int, title, content, created, expires, flash string, isAuthenticated bool){
-    @html.Base(title, flash,isAuthenticated, viewContent(id, title, content, created, expires))
+templ ViewSnippet(id int, title, content, created, expires, flash string, isAuthenticated bool, csrfToken string){
+    @html.Base(title, flash,isAuthenticated, csrfToken, viewContent(id, title, content, created, expires))
 }
 
 templ viewContent(id int, title, content, created, expires string){

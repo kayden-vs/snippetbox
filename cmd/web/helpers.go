@@ -8,6 +8,7 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/go-playground/form"
+	"github.com/justinas/nosurf"
 )
 
 func (app *application) serverError(w http.ResponseWriter, err error) {
@@ -29,12 +30,13 @@ func (app *application) notFound(w http.ResponseWriter) {
 func (app *application) RenderPage(
 	w http.ResponseWriter,
 	r *http.Request,
-	renderFunc func(flash string, isAuthenticated bool) templ.Component,
+	renderFunc func(flash string, isAuthenticated bool, csrfToken string) templ.Component,
 ) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	flash := app.sessionManager.PopString(r.Context(), "flash")
 	isAuth := app.isAuthenticated(r)
-	err := renderFunc(flash, isAuth).Render(r.Context(), w)
+	csrfToken := nosurf.Token(r)
+	err := renderFunc(flash, isAuth, csrfToken).Render(r.Context(), w)
 	if err != nil {
 		app.errorLog.Println(err.Error())
 		app.serverError(w, err)

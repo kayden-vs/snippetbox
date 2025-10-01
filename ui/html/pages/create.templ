@@ -10,14 +10,16 @@ type SnippetCreateForm struct {
     Content             string `form:"content"`
     Expires             int    `form:"expires"`
     validator.Validator `form:"-"`
+    CSRFToken           string
 }
 
 templ SnippetForm(formData SnippetCreateForm, isAuthenticated bool){
-    @html.Base("New snippet","",isAuthenticated , actualForm(formData))
+    @html.Base("New snippet","",isAuthenticated, formData.CSRFToken, actualForm(formData))
 }
 
 templ actualForm(formData SnippetCreateForm){
     <form action='/snippet/create' method='POST'>
+    <input type='hidden' name='csrf_token' value={ formData.CSRFToken }/>
     <div>
         <label>Title:</label>
         <input type='text' name='title' value={ formData.Title }>

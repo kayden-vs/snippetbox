@@ -21,8 +21,8 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.RenderPage(w, r, func(flash string, isAuthenticated bool) templ.Component {
-		return pages.HomePage(snippets, flash, isAuthenticated)
+	app.RenderPage(w, r, func(flash string, isAuthenticated bool, csrfToken string) templ.Component {
+		return pages.HomePage(snippets, flash, isAuthenticated, csrfToken)
 	})
 }
 
@@ -46,8 +46,8 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 
 	createdStr := snippet.Created.Format("02 Jan 2006 at 15:04")
 	expiresStr := snippet.Expires.Format("02 Jan 2006 at 15:04")
-	app.RenderPage(w, r, func(flash string, isAuthenticated bool) templ.Component {
-		return pages.ViewSnippet(snippet.ID, snippet.Title, snippet.Content, createdStr, expiresStr, flash, isAuthenticated)
+	app.RenderPage(w, r, func(flash string, isAuthenticated bool, csrfToken string) templ.Component {
+		return pages.ViewSnippet(snippet.ID, snippet.Title, snippet.Content, createdStr, expiresStr, flash, isAuthenticated, csrfToken)
 
 	})
 }
@@ -70,10 +70,8 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 	form.CheckField(validator.PermittedInt(form.Expires, 1, 7, 365), "expires", "This field must equal 1, 7 or 365")
 
 	if !form.Valid() {
-		app.RenderPage(w, r, func(flash string, isAuthenticated bool) templ.Component {
-			return pages.SnippetForm(form, isAuthenticated)
-		})
-		app.RenderPage(w, r, func(flash string, isAuthenticated bool) templ.Component {
+		app.RenderPage(w, r, func(flash string, isAuthenticated bool, csrfToken string) templ.Component {
+			form.CSRFToken = csrfToken
 			return pages.SnippetForm(form, isAuthenticated)
 		})
 		return
@@ -97,7 +95,8 @@ func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
 		Validator: validator.Validator{FieldErrors: make(map[string]string)},
 	}
 
-	app.RenderPage(w, r, func(flash string, isAuthenticated bool) templ.Component {
+	app.RenderPage(w, r, func(flash string, isAuthenticated bool, csrfToken string) templ.Component {
+		form.CSRFToken = csrfToken
 		return pages.SnippetForm(form, isAuthenticated)
 	})
 }
@@ -112,7 +111,8 @@ type userSignupForm struct {
 func (app *application) userSignup(w http.ResponseWriter, r *http.Request) {
 
 	props := pages.SignupFormParams{}
-	app.RenderPage(w, r, func(flash string, isAuthenticated bool) templ.Component {
+	app.RenderPage(w, r, func(flash string, isAuthenticated bool, csrfToken string) templ.Component {
+		props.CSRFToken = csrfToken
 		return pages.SignupPage(props, isAuthenticated)
 	})
 }
@@ -141,7 +141,8 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 	// If there are any errors, redisplay the signup form along with a 422
 	// status code.
 	if !form.Valid() {
-		app.RenderPage(w, r, func(flash string, isAuthenticated bool) templ.Component {
+		app.RenderPage(w, r, func(flash string, isAuthenticated bool, csrfToken string) templ.Component {
+			props.CSRFToken = csrfToken
 			return pages.SignupPage(props, isAuthenticated)
 		})
 		return
@@ -152,7 +153,8 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, models.ErrDuplicateEmail) {
 			form.AddFieldError("email", "Email address is already in use")
 			props.FieldErrors = form.FieldErrors
-			app.RenderPage(w, r, func(flash string, isAuthenticated bool) templ.Component {
+			app.RenderPage(w, r, func(flash string, isAuthenticated bool, csrfToken string) templ.Component {
+				props.CSRFToken = csrfToken
 				return pages.SignupPage(props, isAuthenticated)
 			})
 		} else {
@@ -173,7 +175,8 @@ type userLoginForm struct {
 
 func (app *application) userLogin(w http.ResponseWriter, r *http.Request) {
 	props := pages.LoginFormParams{}
-	app.RenderPage(w, r, func(flash string, isAuthenticated bool) templ.Component {
+	app.RenderPage(w, r, func(flash string, isAuthenticated bool, csrfToken string) templ.Component {
+		props.CSRFToken = csrfToken
 		return pages.LoginPage(props, flash, isAuthenticated)
 	})
 }
@@ -197,7 +200,8 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		NonFieldErrors: form.NonFieldErrors,
 	}
 	if !form.Valid() {
-		app.RenderPage(w, r, func(flash string, isAuthenticated bool) templ.Component {
+		app.RenderPage(w, r, func(flash string, isAuthenticated bool, csrfToken string) templ.Component {
+			props.CSRFToken = csrfToken
 			return pages.LoginPage(props, flash, isAuthenticated)
 		})
 		return
@@ -208,7 +212,8 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		if errors.Is(err, models.ErrInvalidCredentials) {
 			form.AddNonFieldError("Email or password is incorrect")
 			props.NonFieldErrors = form.NonFieldErrors
-			app.RenderPage(w, r, func(flash string, isAuthenticated bool) templ.Component {
+			app.RenderPage(w, r, func(flash string, isAuthenticated bool, csrfToken string) templ.Component {
+				props.CSRFToken = csrfToken
 				return pages.LoginPage(props, flash, isAuthenticated)
 			})
 		} else {

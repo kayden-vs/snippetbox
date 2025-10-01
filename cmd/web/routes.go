@@ -23,6 +23,7 @@ func (app *application) routes() http.Handler {
 	// --- Dynamic & Session-Enabled Routes ---
 	r.Group(func(r chi.Router) {
 		r.Use(app.sessionManager.LoadAndSave)
+		r.Use(noSurf)
 
 		r.Get("/", app.home)
 		r.Get("/snippet/view/{id}", app.snippetView)
