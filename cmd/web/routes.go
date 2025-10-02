@@ -1,10 +1,12 @@
 package main
 
 import (
+	"io/fs"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/kayden-vs/snippetbox/ui"
 )
 
 func (app *application) routes() http.Handler {
@@ -17,7 +19,11 @@ func (app *application) routes() http.Handler {
 	r.Use(app.secureHeaders)
 
 	// --- Public Routes ---
-	fileServer := http.FileServer(http.Dir("./ui/static/"))
+	staticFS, err := fs.Sub(ui.Files, "static")
+	if err != nil {
+		panic(err)
+	}
+	fileServer := http.FileServer(http.FS(staticFS))
 	r.Handle("/static/*", http.StripPrefix("/static", fileServer))
 
 	// --- Dynamic & Session-Enabled Routes ---
