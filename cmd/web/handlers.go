@@ -138,8 +138,7 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 		FieldErrors: form.FieldErrors,
 	}
 
-	// If there are any errors, redisplay the signup form along with a 422
-	// status code.
+	// If there are any errors, redisplay the signup form along with a 422 status code.
 	if !form.Valid() {
 		app.RenderPage(w, r, func(flash string, isAuthenticated bool, csrfToken string) templ.Component {
 			props.CSRFToken = csrfToken
@@ -242,4 +241,8 @@ func (app *application) userLogoutPost(w http.ResponseWriter, r *http.Request) {
 	app.sessionManager.Remove(r.Context(), "authenticatedUserID")
 	app.sessionManager.Put(r.Context(), "flash", "You've been logged out Succesfully!")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func ping(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("OK"))
 }
