@@ -26,6 +26,8 @@ func (app *application) routes() http.Handler {
 	fileServer := http.FileServer(http.FS(staticFS))
 	r.Handle("/static/*", http.StripPrefix("/static", fileServer))
 
+	r.Get("/ping", ping)
+
 	// --- Dynamic & Session-Enabled Routes ---
 	r.Group(func(r chi.Router) {
 		r.Use(app.sessionManager.LoadAndSave)
