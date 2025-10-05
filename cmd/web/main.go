@@ -19,8 +19,8 @@ import (
 type application struct {
 	errorLog       *log.Logger
 	infoLog        *log.Logger
-	snippets       *models.SnippetModel
-	users          *models.UserModel
+	snippets       models.SnippetModelInterface
+	users          models.UserModelInterface
 	formDecoder    *form.Decoder
 	sessionManager *scs.SessionManager
 }
@@ -50,8 +50,8 @@ func main() {
 	app := &application{
 		errorLog:       errorLog,
 		infoLog:        infoLog,
-		snippets:       &models.SnippetModel{DB: db},
-		users:          &models.UserModel{DB: db},
+		snippets:       &models.SnippetModel{},
+		users:          &models.UserModel{},
 		formDecoder:    formDecoder,
 		sessionManager: sessionManager,
 	}
